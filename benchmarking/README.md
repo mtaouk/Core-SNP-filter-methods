@@ -26,7 +26,9 @@ snp-sites "$input" > "$output"
 goalign clean sites --char MAJ --cutoff 1 --ignore-gaps --ignore-n -i "$input" > "$output"
 ```
 
-The only difference seems to be that `snp-sites` doesn't preserve case (all output sequences are uppercase) while `coresnpfilter` and `goalign` do. Also, `goalign` includes line breaks in its output FASTA sequences while `coresnpfilter` and `snp-sites` do not.
+The only differences seems to be:
+* `coresnpfilter` and `goalign` preserve case (uppercase vs lowercase bases) while `snp-sites` does not.
+* `goalign` includes line breaks in its output FASTA sequences while `coresnpfilter` and `snp-sites` do not.
 
 These two commands produce the same output for task #2:
 ```bash
@@ -35,14 +37,14 @@ coresnpfilter --core 0.95 "$input" > "$output"
 goalign clean sites --char ACGTacgt --reverse --cutoff 0.0500001 -i "$input" > "$output"
 ```
 
-When using `--core 0.95`, Core-SNP-Filter will keep a site that is in exactly 95% of the sequences (e.g. 19/20). However, goalign will drop a site that is in exactly 95% of the sequences if it is run with `--cutoff 0.05`. I think this is because it uses `>=` in its code, while Core-SNP-Filter uses `<`. To ensure that the tools produce the same result, I use `--cutoff 0.0500001` instead.
+When using `--core 0.95`, Core-SNP-Filter will keep a site that is in exactly 95% of the sequences (e.g. 19/20). However, goalign will drop a site that is in exactly 95% of the sequences if it is run with `--cutoff 0.05`. To ensure that the tools produced the same result, I used `--cutoff 0.0500001` instead.
 
 
 
 
 ## Test data
 
-I started with the same 10k genome Typhi pseudoalignment used in the paper, which I named `full_10000.fasta`. This alignment is 4809037 bp long (the length of the [_S. enterica_ CT18](https://www.ncbi.nlm.nih.gov/assembly/GCF_000195995.1) chromosome) and has a file size of 47 GB.
+I started with the same 10k genome Typhi pseudoalignment used in the paper, which I named `full_10000.fasta`. This alignment is 4,809,037 bp long (the length of the [_S. enterica_ CT18](https://www.ncbi.nlm.nih.gov/assembly/GCF_000195995.1) chromosome) and has a file size of 47 GB.
 
 The sequences in this pseudoalignment contain only the following characters: `-`, `A`, `C`, `G`, `N`, `T`, `a`, `c`, `g`, `n`, `t`. I.e. the four bases (either uppercase or lowercase), N for unknown bases (either uppercase or lowercase) and dash for gaps.
 
@@ -117,6 +119,24 @@ done
 ```
 
 Some notes:
-* I initially tried running goalign with both 1 thread and 16 threads. However, once it became clear that 16-thread goalign was no faster than 1-thread goalign, I dropped those from subsequent replicates (why they are commented out).
-* I included md5sums in the results to make sure that all tools were giving the same result (they were). I used [seqtk](https://github.com/lh3/seqtk) to make all sequences uppercase and single-line.
-* [GNU Time](https://www.gnu.org/software/time/) only gives timing down to 0.01 seconds. For small alignments in taks #2, this was insufficient precision resulting in 0.00 seconds.
+* I ran each test eight times, and the results below show the minimum time/RAM across all eight tests.
+* I initially tried running `goalign` with both 1 thread and 16 threads. However, once it became clear that 16-thread `goalign` was no faster than 1-thread `goalign`, I dropped those from subsequent replicates. That's why the 16-thread `goalign` commands are commented out.
+* I included md5sums in the results to make sure that all tools produce the same result. I used [seqtk](https://github.com/lh3/seqtk) to make all sequences uppercase and single-line.
+* [GNU Time](https://www.gnu.org/software/time/) only gives timing down to 0.01 seconds. For small alignments in task #2, this precision was insufficient, resulting in times of 0.00 seconds (labelled as <10 ms in the plot below).
+
+
+
+
+## Results
+
+<p align="center"><img src="results.png" alt="Benchmarking results" width="100%"></p>
+
+
+
+
+## Conclusions
+
+* Time taken was approximately linearly related to genome count for all tools and tasks.
+* For removing invariant sites, `snp-sites` was fastest. `coresnpfilter` took about 1.5× the time of `snp-sites`, and `goalign` took about 7× the time of `coresnpfilter`.
+* For producing a 95% core, `coresnpfilter` was fastest. `goalign` took about 4× the time of `coresnpfilter`.
+* For both tasks, `coresnpfilter` used a fixed amount of RAM, regardless of the genome count. For removing invariant sites, `goalign` used up to ~100 GB of RAM when the genome count is high.
