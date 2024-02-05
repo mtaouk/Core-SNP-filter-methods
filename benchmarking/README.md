@@ -129,8 +129,7 @@ Some notes:
 
 ## Results
 
-<p align="center"><img src="results.png" alt="Benchmarking results" width="100%"></p>
-
+<p align="center"><picture><source srcset="results-dark.png" media="(prefers-color-scheme: dark)"><img src="results.png" alt="Benchmarking results" width="100%"></picture></p>
 
 
 
