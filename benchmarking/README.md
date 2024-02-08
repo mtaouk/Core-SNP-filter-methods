@@ -4,20 +4,20 @@ This benchmarking test quantifies the time and RAM for these two tasks:
 1. full alignment → no-invariant-sites alignment
 2. no-invariant-sites alignment → 95% core alignment
 
-[Core-SNP-Filter](https://github.com/rrwick/Core-SNP-filter) and [goalign](https://github.com/evolbioinfo/goalign) can do both #1 and #2, and [snp-sites](https://github.com/sanger-pathogens/snp-sites) can do #1.
+[Core-SNP-Filter](https://github.com/rrwick/Core-SNP-filter) and [goalign](https://github.com/evolbioinfo/goalign) can do both #1 and #2, [snp-sites](https://github.com/sanger-pathogens/snp-sites) can do #1, and [trimAl](http://trimal.cgenomics.org/introduction) can do #2.
 
-All three tools were written in a fast compiled programming language: `coresnpfilter` in Rust, `goalign` in Go and `snp-sites` in C. `coresnpfilter` and `snp-sites` are single-threaded, and `goalign` is effectively single-threaded (while it has a `--threads` option, using multiple threads had no effect on performance, see below).
+All four tools were written in a fast compiled programming language: `coresnpfilter` in Rust, `goalign` in Go, `snp-sites` in C and `trimal` in C++. `coresnpfilter`, `snp-sites` and `trimal` are single-threaded, and `goalign` is effectively single-threaded (while it has a `--threads` option, using multiple threads had no effect on performance, see below).
 
 For each tool, I cloned the latest version from GitHub and built it from source on the same computer I used to run the tests (AMD EPYC 7742 CPU, 512 GB RAM).
 
 
 
 
-## Commands
+## Task #1 commands
 
 There was a lot of helpful discussion on [this thread](https://github.com/evolbioinfo/goalign/issues/5) regarding how to construct goalign commands.
 
-These three commands produce the same output for task #1:
+These three commands produce mostly the same output for task #1:
 ```bash
 coresnpfilter --exclude_invariant "$input" > "$output"
 
@@ -26,18 +26,28 @@ snp-sites "$input" > "$output"
 goalign clean sites --char MAJ --cutoff 1 --ignore-gaps --ignore-n -i "$input" > "$output"
 ```
 
-The only differences seems to be:
+Notes:
 * `coresnpfilter` and `goalign` preserve case (uppercase vs lowercase bases) while `snp-sites` does not.
 * `goalign` includes line breaks in its output FASTA sequences while `coresnpfilter` and `snp-sites` do not.
+* I tried to get `trimal` to work for this task, but I couldn't make it work. While the `-st 1 -complementary` options seem like they should do the trick (see [docs](http://trimal.cgenomics.org/use_of_the_command_line_trimal_v1.2) and [this issue](https://github.com/inab/trimal/issues/37)), the resulting alignments still contained columns composed of one base and gaps.
 
-These two commands produce the same output for task #2:
+
+
+
+## Task #2 commands
+
+These three commands produce mostly the same output for task #2:
 ```bash
 coresnpfilter --core 0.95 "$input" > "$output"
 
 goalign clean sites --char ACGTacgt --reverse --cutoff 0.0500001 -i "$input" > "$output"
+
+trimal -gt 0.95 -in "$input" -out "$output"
 ```
 
-When using `--core 0.95`, Core-SNP-Filter will keep a site that is in exactly 95% of the sequences (e.g. 19/20). However, goalign will drop a site that is in exactly 95% of the sequences if it is run with `--cutoff 0.05`. To ensure that the tools produced the same result, I used `--cutoff 0.0500001` instead.
+Notes:
+* When using `--core 0.95`, Core-SNP-Filter will keep a site that is in exactly 95% of the sequences (e.g. 19/20). However, goalign will drop a site that is in exactly 95% of the sequences if it is run with `--cutoff 0.05`. To ensure that the tools produced the same result, I used `--cutoff 0.0500001` instead.
+* `trimal` doesn't consider ambiguous bases to be the same as gaps, so it was necessary to first convert all `N` bases to gaps (`sed 's/[Nn]/-/g'`) before running trimal. This is why its output is slightly different from the other tools.
 
 
 
@@ -112,7 +122,15 @@ for rep in 1 2 3 4 5 6 7 8; do
         # printf "95 core\t$count\t$rep\tgoalign 16 threads\t%s\t$no_invariant_len\t$len\t$md5\n" "$(cat time.txt)" >> results.tsv
         # rm result.fasta time.txt
 
-        rm subsample_no_invariant.fasta
+        cat subsample_no_invariant.fasta | sed 's/[Nn]/-/g' > subsample_no_invariant_n_to_gap.fasta
+
+        /usr/bin/time -f "%e\t%M" -o time.txt trimal -gt 0.95 -in subsample_no_invariant_n_to_gap.fasta -out result.fasta
+        len=$(seqtk seq result.fasta | head -n2 | tail -n1 | awk '{print length($0)}')
+        md5=$(seqtk seq -U result.fasta | md5sum | cut -f1 -d' ')
+        printf "95 core\t$count\t$rep\ttrimal\t%s\t$no_invariant_len\t$len\t$md5\n" "$(cat time.txt)" >> results.tsv
+        rm result.fasta time.txt
+
+        rm subsample_no_invariant.fasta subsample_no_invariant_n_to_gap.fasta
 
     done
 done
@@ -121,7 +139,7 @@ done
 Some notes:
 * I ran each test eight times, and the results below show the minimum time/RAM across all eight tests.
 * I initially tried running `goalign` with both 1 thread and 16 threads. However, once it became clear that 16-thread `goalign` was no faster than 1-thread `goalign`, I dropped those from subsequent replicates. That's why the 16-thread `goalign` commands are commented out.
-* I included md5sums in the results to make sure that all tools produce the same result. I used [seqtk](https://github.com/lh3/seqtk) to make all sequences uppercase and single-line.
+* I included md5sums in the results to make sure that all tools produce the same result (which they did except for `trimal` because of the `N` to `-` replacement, see above). I used [seqtk](https://github.com/lh3/seqtk) to make all sequences uppercase and single-line.
 * [GNU Time](https://www.gnu.org/software/time/) only gives timing down to 0.01 seconds. For small alignments in task #2, this precision was insufficient, resulting in times of 0.00 seconds (labelled as <10 ms in the plot below).
 
 
@@ -137,5 +155,5 @@ Some notes:
 
 * Time taken was approximately linearly related to genome count for all tools and tasks.
 * For removing invariant sites, `snp-sites` was fastest. `coresnpfilter` took about 1.5× the time of `snp-sites`, and `goalign` took about 7× the time of `coresnpfilter`.
-* For producing a 95% core, `coresnpfilter` was fastest. `goalign` took about 4× the time of `coresnpfilter`.
+* For producing a 95% core, `coresnpfilter` was fastest. `goalign` and `trimal` took about 4× the time of `coresnpfilter`.
 * For both tasks, `coresnpfilter` used a fixed amount of RAM, regardless of the genome count. For removing invariant sites, `goalign` used up to ~100 GB of RAM when the genome count is high.
