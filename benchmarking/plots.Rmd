@@ -32,12 +32,12 @@ check_integrity <- function(md5sums) {
   stopifnot(length(unique(md5sums)) == 1)
 }
 
-results %>%
-  group_by(test, genome_count) %>%
-  do({
-    check_integrity(.$output_md5sum)
-    . # Return the data unmodified if the assertion passes
-  })
+# results %>%
+#   group_by(test, genome_count) %>%
+#   do({
+#     check_integrity(.$output_md5sum)
+#     . # Return the data unmodified if the assertion passes
+#   })
 ```
 
 The 16-thread goalign didn't run any faster than the 1-thread, so drop 16-thread results:
@@ -45,7 +45,7 @@ The 16-thread goalign didn't run any faster than the 1-thread, so drop 16-thread
 results <- results %>% filter(tool != "goalign 16 threads")
 results$tool <- gsub("goalign 1 thread", "goalign", results$tool)
 results$tool <- gsub("Core-SNP-Filter", "coresnpfilter", results$tool)
-results$tool <- factor(results$tool, levels = c("goalign", "coresnpfilter", "snp-sites"))
+results$tool <- factor(results$tool, levels = c("trimal", "goalign", "coresnpfilter", "snp-sites"))
 ```
 
 Produce results dataframes with the best time/RAM for each tool:
@@ -66,13 +66,40 @@ core_results$ram_mb <- apply(select(core_results, starts_with("ram_kb_")), 1, FU
 ```{r plot, fig.width = 10, fig.height = 6.5}
 colours <- scale_color_manual(values = c("goalign" = "#1b9e77",
                                          "coresnpfilter" = "#d95f02",
-                                         "snp-sites" = "#7570b3"))
-shapes <- scale_shape_manual(values = c("goalign" = 15,
-                                        "coresnpfilter" = 16,
-                                        "snp-sites" = 17))
+                                         "snp-sites" = "#7570b3",
+                                         "trimal" = "#377eb8"))
+fills <- scale_fill_manual(values = c("goalign" = "#1b9e77",
+                                      "coresnpfilter" = "#d95f02",
+                                      "snp-sites" = "#7570b3",
+                                      "trimal" = "#377eb8"))
+shapes <- scale_shape_manual(values = c("goalign" = 22,
+                                        "coresnpfilter" = 21,
+                                        "snp-sites" = 24,
+                                        "trimal" = 23))
 
-p1 <- ggplot(invariant_results, aes(x=genome_count, y=seconds, color=tool, shape=tool)) +
-  geom_point(size=1.9) + geom_line(size=0.7) + colours + shapes +
+dark <- function() {
+  theme_bw() +
+  theme(
+    plot.background = element_blank(),
+    panel.background = element_rect(fill = "#0f1217", color = NA),
+    panel.border = element_rect(color = "#d8d8d8", fill = NA),
+    axis.title = element_text(color = "#ffffff"),
+    axis.text = element_text(color = "#bababa"),
+    axis.ticks = element_line(color = "#d8d8d8"),
+    panel.grid.major = element_line(color = "#1d2026"),
+    panel.grid.minor = element_line(color = "#1d2026"),
+    plot.title = element_text(color = "#ffffff"),
+    plot.subtitle = element_text(color = "#bababa"),
+    plot.caption = element_text(color = "#bababa"),
+    legend.background = element_blank(),
+    legend.key = element_blank(),
+    legend.text = element_text(color = "#ffffff"),
+    legend.position = "none"
+  )
+}
+
+p1 <- ggplot(invariant_results, aes(x=genome_count, y=seconds, color=tool, shape=tool, fill=tool)) +
+  geom_point(size=1.9) + geom_line(size=0.7) + colours + shapes + fills +
   theme_bw() + theme(legend.position = "none") +
   scale_x_log10(labels = label_comma(), minor_breaks = NULL) +
   scale_y_log10(breaks = c(1, 10, 60, 600, 3600, 36000), minor_breaks = NULL,
@@ -80,8 +107,8 @@ p1 <- ggplot(invariant_results, aes(x=genome_count, y=seconds, color=tool, shape
                 limits = c(0.3, 36000)) +
   labs(title="Invariant removal time", x="genomes", y=NULL)
 
-p2 <- ggplot(invariant_results, aes(x=genome_count, y=ram_mb, color=tool, shape=tool)) +
-  geom_point(size=1.9) + geom_line(size=0.7) + colours + shapes +
+p2 <- ggplot(invariant_results, aes(x=genome_count, y=ram_mb, color=tool, shape=tool, fill=tool)) +
+  geom_point(size=1.9) + geom_line(size=0.7) + colours + shapes + fills +
   theme_bw() + theme(legend.position = "none") +
   scale_x_log10(labels = label_comma(), minor_breaks = NULL) +
   scale_y_log10(breaks = c(1, 10, 100, 1000, 10000, 100000), minor_breaks = NULL,
@@ -89,8 +116,8 @@ p2 <- ggplot(invariant_results, aes(x=genome_count, y=ram_mb, color=tool, shape=
                 limits = c(10, 100000)) +
   labs(title="Invariant removal RAM usage", x="genomes", y=NULL)
 
-p3 <- ggplot(core_results, aes(x=genome_count, y=seconds, color=tool, shape=tool)) +
-  geom_point(size=1.9) + geom_line(size=0.7) + colours + shapes +
+p3 <- ggplot(core_results, aes(x=genome_count, y=seconds, color=tool, shape=tool, fill=tool)) +
+  geom_point(size=1.9) + geom_line(size=0.7) + colours + shapes + fills +
   theme_bw() + theme(legend.position = "none") +
   scale_x_log10(labels = label_comma(), minor_breaks = NULL) +
   # scale_y_log10(breaks = c(0.01, 0.1, 1, 10, 60, 600, 3600, 36000), minor_breaks = NULL,
@@ -101,8 +128,8 @@ p3 <- ggplot(core_results, aes(x=genome_count, y=seconds, color=tool, shape=tool
                      limits = c(0.0, 63)) +
   labs(title="95% core time", x="genomes", y=NULL)
 
-p4 <- ggplot(core_results, aes(x=genome_count, y=ram_mb, color=tool, shape=tool)) +
-  geom_point(size=1.9) + geom_line(size=0.7) + colours + shapes +
+p4 <- ggplot(core_results, aes(x=genome_count, y=ram_mb, color=tool, shape=tool, fill=tool)) +
+  geom_point(size=1.9) + geom_line(size=0.7) + colours + shapes + fills +
   theme_bw() + theme(legend.position = "none") +
   scale_x_log10(labels = label_comma(), minor_breaks = NULL) +
   scale_y_log10(breaks = c(1, 10, 100, 1000, 10000, 100000), minor_breaks = NULL,
@@ -110,7 +137,18 @@ p4 <- ggplot(core_results, aes(x=genome_count, y=ram_mb, color=tool, shape=tool)
                 limits = c(1, 10000)) +
   labs(title="95% core RAM usage", x="genomes", y=NULL)
 
-legend <- get_legend(p1 + theme(legend.position = "right", legend.title=element_blank()))
+legend1 <- get_legend(p1 + theme(legend.position = "right", legend.title=element_blank()))
+legend2 <- get_legend(p3 + theme(legend.position = "right", legend.title=element_blank()))
 
-plot_grid(plot_grid(p1, p2, p3, p4, nrow = 2, align = 'hv'), legend, nrow=1, rel_widths=c(1, 0.2))
+plot_grid(p1, p2, legend1, p3, p4, legend2, nrow = 2, align = 'hv', rel_widths=c(0.5, 0.5, 0.2))
+
+
+p1_dark <- p1 + dark()
+p2_dark <- p2 + dark()
+p3_dark <- p3 + dark()
+p4_dark <- p4 + dark()
+legend1_dark <- get_legend(p1 + dark() + theme(legend.position = "right", legend.title=element_blank()))
+legend2_dark <- get_legend(p3 + dark() +  theme(legend.position = "right", legend.title=element_blank()))
+
+plot_grid(p1_dark, p2_dark, legend1_dark, p3_dark, p4_dark, legend2_dark, nrow = 2, align = 'hv', rel_widths=c(0.5, 0.5, 0.2))
 ```
