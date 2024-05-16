@@ -8,21 +8,6 @@ The [supp data](https://www.science.org/doi/suppl/10.1126/science.1198545/suppl_
 
 
 
-# Prep directories
-
-```bash
-cd /scratch/kr58/ryan/Verticall_paper
-mkdir S_pneumo_PMEN1
-
-cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1
-mkdir reads
-mkdir assemblies
-mkdir alignments
-```
-
-
-
-
 # Download reads
 
 The [supp data](https://www.science.org/doi/suppl/10.1126/science.1198545/suppl_file/1198545s2-rev.xls) gives accessions as ERS numbers, but to download the reads, I needed BioSample accessions. I found that the ENA records were very strange for these BioSamples - most of them had multiple SRA runs, with the same SRA run often showing up in multiple BioSamples. For example, ERR019724 was associated with SAMEA677436, SAMEA677438, SAMEA677440, SAMEA677441, SAMEA677443, SAMEA677445, SAMEA677448 and SAMEA677748. This meant that I couldn't use [ENA's downloader tool](https://github.com/enasequence/ena-ftp-downloader) to get the reads.
@@ -40,7 +25,7 @@ done
 
 A few samples genuinely had multiple SRA runs, which I downloaded separately:
 ```bash
-cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/reads
+cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/reads
 wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 0 -O SAMEA1931624_1.fastq.gz ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR406/ERR406040/ERR406040_1.fastq.gz
 wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 0 -O SAMEA1931624_2.fastq.gz ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR406/ERR406040/ERR406040_2.fastq.gz
 wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 0 -O SAMEA2042016_1.fastq.gz ftp://ftp.sra.ebi.ac.uk/vol1/fastq/ERR406/ERR406039/ERR406039_1.fastq.gz
@@ -557,7 +542,7 @@ wget --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 0 -O SA
 
 Sanity check that the downloads look good (`_1.fastq.gz` and `_2.fastq.gz` files have the same number of reads):
 ```bash
-cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/reads
+cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/reads
 for s in $(ls *_1.fastq.gz | sed 's/_1.fastq.gz//'); do
     r1_count=$(fast_count "$s"_1.fastq.gz | cut -f2)
     r2_count=$(fast_count "$s"_2.fastq.gz | cut -f2)
@@ -576,11 +561,11 @@ done
 
 I assembled each read set with Unicycler. Samples with multiple read sets were assembled separately:
 ```bash
-cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/assemblies
-for r1 in /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/reads/*_1.fastq.gz; do
+cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/assemblies
+for r1 in /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/reads/*_1.fastq.gz; do
     r2=${r1/_1.fastq.gz/_2.fastq.gz}
     s=$(echo "$r1" | grep -oP "SAM[EAN]+\d+a?b?c?")
-    cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/assemblies
+    cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/assemblies
     mkdir "$s"; cd "$s"
     sbatch --job-name="$s" --time=0-4:00:00 --partition=genomics --qos=genomics --ntasks=1 --mem=64000 --cpus-per-task=8 --account md52 --wrap "module load spades/3.15.3; module load blast+/2.9.0; fastp --in1 "$r1" --in2 "$r2" --out1 illumina_1.fastq.gz --out2 illumina_2.fastq.gz --unpaired1 illumina_u.fastq.gz --unpaired2 illumina_u.fastq.gz; /home/rwic0002/programs/Unicycler/unicycler-runner.py -1 illumina_1.fastq.gz -2 illumina_2.fastq.gz -s illumina_u.fastq.gz -o unicycler --threads 8; rm illumina_*.fastq.gz"
 done
@@ -594,7 +579,7 @@ done
 There were multiple read sets for some samples, and I decided to just use a single best one for each (i.e. not pool them in case there was heterogeneity between sets). I used assembly N50 (higher is better) to decide which read set was best, and if there was a tie I broke it with read depth (higher is better).
 
 ```bash
-cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/assemblies
+cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/assemblies
 for s in $(ls | grep -P "SAM[EAN]+\d+[abc]"); do
     n50=$(fast_count "$s"/unicycler/assembly.fasta | cut -f6)
     echo $s"\t"$n50
@@ -635,32 +620,32 @@ Here are the assembly N50s, with a star indicating best:
 
 For assemblies and reads, I renamed the best set to not have a letter and moved the others into an `unused` directory:
 ```bash
-cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/assemblies
+cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/assemblies
 mkdir unused
-cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/reads
+cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/reads
 mkdir unused
 
 # assembly A is the best
 for s in SAMEA677436 SAMEA677440 SAMEA677441 SAMEA677443 SAMEA677448 SAMEA677517 SAMEA677518 SAMEA677520 SAMEA677521 SAMEA677522 SAMEA677527 SAMEA677530 SAMEA677565 SAMEA677566 SAMEA677570 SAMEA677571 SAMEA677573 SAMEA677688; do
-    cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/assemblies
+    cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/assemblies
     mv "$s"a "$s"; mv "$s"[bc] unused
-    cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/reads
+    cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/reads
     mv "$s"a_1.fastq.gz "$s"_1.fastq.gz; mv "$s"a_2.fastq.gz "$s"_2.fastq.gz; mv "$s"[bc]_[12].fastq.gz unused
 done
 
 # assembly B is the best
 for s in SAMEA677525 SAMEA677526 SAMEA677531 SAMEA677568 SAMEA677572 SAMEA677574; do
-    cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/assemblies
+    cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/assemblies
     mv "$s"b "$s"; mv "$s"[ac] unused
-    cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/reads
+    cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/reads
     mv "$s"b_1.fastq.gz "$s"_1.fastq.gz; mv "$s"b_2.fastq.gz "$s"_2.fastq.gz; mv "$s"[ac]_[12].fastq.gz unused
 done
 
 # assembly C is the best
 for s in SAMEA677438 SAMEA677445 SAMEA677748; do
-    cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/assemblies
+    cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/assemblies
     mv "$s"c "$s"; mv "$s"[ab] unused
-    cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/reads
+    cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/reads
     mv "$s"c_1.fastq.gz "$s"_1.fastq.gz; mv "$s"c_2.fastq.gz "$s"_2.fastq.gz; mv "$s"[ab]_[12].fastq.gz unused
 done
 ```
@@ -672,7 +657,7 @@ done
 
 Total read bases:
 ```bash
-cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/reads
+cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/reads
 for r1 in *_1.fastq.gz; do
     r2=${r1/_1.fastq.gz/_2.fastq.gz}
     s=$(echo "$r1" | grep -oP "SAM[EAN]+\d+")
@@ -685,7 +670,7 @@ done
 
 fastp filtering:
 ```bash
-cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/assemblies
+cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/assemblies
 for s in SAM*; do
     r1_bases_before=$(cat "$s"/slurm-*.out | grep -A2 "Read1 before filtering:" | grep "total bases:" | grep -oP "\d+")
     r2_bases_before=$(cat "$s"/slurm-*.out | grep -A2 "Read2 before filtering:" | grep "total bases:" | grep -oP "\d+")
@@ -698,7 +683,7 @@ done
 
 Assembly size (from fasta):
 ```bash
-cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/assemblies
+cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/assemblies
 for s in SAM*; do
     size=$(fast_count "$s"/unicycler/assembly.fasta | cut -f3)
     echo $s"\t"$size
@@ -707,7 +692,7 @@ done
 
 Assembly N50 (from fasta):
 ```bash
-cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/assemblies
+cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/assemblies
 for s in SAM*; do
     n50=$(fast_count "$s"/unicycler/assembly.fasta | cut -f6)
     echo $s"\t"$n50
@@ -716,7 +701,7 @@ done
 
 Assembly contigs (from fasta):
 ```bash
-cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/assemblies
+cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/assemblies
 for s in SAM*; do
     n50=$(fast_count "$s"/unicycler/assembly.fasta | cut -f2)
     echo $s"\t"$n50
@@ -725,7 +710,7 @@ done
 
 Assembly dead ends (from gfa):
 ```bash
-cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/assemblies
+cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/assemblies
 for s in SAM*; do
     dead=$(deadends "$s"/unicycler/assembly.gfa)
     echo $s"\t"$dead
@@ -749,27 +734,27 @@ I didn't need a read depth filter, because anything with a bad read depth (e.g. 
 This excluded 66 samples, leaving 155.
 
 ```bash
-mkdir /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/assemblies/qc_fail
-mkdir /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/reads/qc_fail
+mkdir /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/assemblies/qc_fail
+mkdir /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/reads/qc_fail
 
 for s in SAMEA677399 SAMEA677401 SAMEA677403 SAMEA677410 SAMEA677421 SAMEA677422 SAMEA677452 SAMEA677453 SAMEA677454 SAMEA677456 SAMEA677470 SAMEA677489 SAMEA677494 SAMEA677496 SAMEA677497 SAMEA677498 SAMEA677505 SAMEA677507 SAMEA677512 SAMEA677514 SAMEA677534 SAMEA677544 SAMEA677553 SAMEA677554 SAMEA677555 SAMEA677556 SAMEA677557 SAMEA677558 SAMEA677559 SAMEA677563 SAMEA677575 SAMEA677577 SAMEA677579 SAMEA677580 SAMEA677583 SAMEA677585 SAMEA677586 SAMEA677590 SAMEA677591 SAMEA677592 SAMEA677601 SAMEA677608 SAMEA677611 SAMEA677613 SAMEA677622 SAMEA677659 SAMEA677681 SAMEA677689 SAMEA677690 SAMEA677691 SAMEA677692 SAMEA677693 SAMEA677694 SAMEA677695 SAMEA677696 SAMEA677699 SAMEA677702 SAMEA677707 SAMEA677708 SAMEA677747 SAMEA677751 SAMEA677752 SAMEA677753 SAMEA677754 SAMEA677755 SAMEA677756; do
-    cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/reads
+    cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/reads
     mv "$s"_*.fastq.gz qc_fail
-    cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/assemblies
+    cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/assemblies
     mv "$s" qc_fail
 done
 ```
 
 Going forward, I only need the assembly FASTAs, so I'll move the Unicycler files elsewhere and just copy out the final result:
 ```bash
-cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1
+cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1
 mv assemblies assemblies_working_files
 mkdir assemblies
 cd assemblies_working_files
 for s in SAM*; do
     cp "$s"/unicycler/assembly.fasta ../assemblies/"$s".fasta
 done
-cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/assemblies
+cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/assemblies
 gzip *.fasta
 ```
 
@@ -780,7 +765,7 @@ gzip *.fasta
 
 _S. pneumoniae_ ATCC 700669 (same as in paper):
 ```bash
-cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1
+cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1
 wget https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/026/665/GCF_000026665.1_ASM2666v1/GCF_000026665.1_ASM2666v1_genomic.fna.gz
 echo ">Reference" > Reference.fasta
 seqtk seq GCF_000026665.1_ASM2666v1_genomic.fna.gz | head -n2 | tail -n1 >> Reference.fasta
@@ -793,7 +778,7 @@ rm GCF_000026665.1_ASM2666v1_genomic.fna.gz
 # Run Snippy on each sample
 
 ```bash
-base_dir=/projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1; ram=64000; time=0-6:00:00; name=S_pneumo_PMEN1
+base_dir=/home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1; ram=64000; time=0-6:00:00; name=S_pneumo_PMEN1
 ref="$base_dir"/Reference.fasta
 samples=$(ls "$base_dir"/assemblies | grep -oP "SAM[EAN]+\d+")
 
@@ -809,15 +794,15 @@ done
 
 I then removed samples that had too many het calls, defined as >0.5% of the reference size (just one sample):
 ```bash
-mkdir /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/snippy/qc_fail
+mkdir /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/snippy/qc_fail
 s=SAMEA677475
-cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/snippy
+cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/snippy
 mv "$s" qc_fail
-cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/reads
+cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/reads
 mv "$s"_*.fastq.gz qc_fail
-cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/assemblies_working_files
+cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/assemblies_working_files
 mv "$s" qc_fail
-cd /projects/js66/individuals/ryan/Verticall_paper/S_pneumo_PMEN1/assemblies
+cd /home/wickr/Core_SNP_paper/dataset_1_S_pneumo_PMEN1/assemblies
 rm "$s".fasta.gz
 ```
 This left me with 154 samples.
