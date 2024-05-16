@@ -1,0 +1,1 @@
+This directory contains the full computational methods (Markdown files) and results (Excel file) for the temporal-signal tests in this study. These methods often contain hard-coded paths for our computers/servers, so the commands are not runnable as-is for others, but they indicate all of the steps taken.
