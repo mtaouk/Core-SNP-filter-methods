@@ -1,16 +1,17 @@
 # Large Scale Alignments
 
 This ReadMe will detail all code used to generate the large scale
-alignments for both *Neisseria gonorrhoeae* and *Salmonella Typhi*.
+alignments for both *Neisseria gonorrhoeae* and *Salmonella enterica*
+subspecies *typhi*.
 
 The directory structure for this section of the project is as follows:
 
 ```         
 large-scale_alignment
- -- Typhi
-    -- Typhi_fastqs
-    -- Typhi_snippy
-    -- Typhi_alignments
+ -- Sentereica
+    -- Sentereica_fastqs
+    -- Sentereica_snippy
+    -- Sentereica_alignments
        -- test_alignments
           --A
           --B
@@ -44,8 +45,8 @@ large-scale_alignment
 Make new directory to keep the reads in:
 
 ```         
-mkdir Typhi/Typhi_fastqs
-cd Typhi/Typhi_fastqs
+mkdir Sentereica/Sentereica_fastqs
+cd Sentereica/Sentereica_fastqs
 
 mkdir Ngono/N_gono_fastqs
 cd Ngono/N_gono_fastqs
@@ -61,7 +62,7 @@ for i in $(cat Run_accessions.txt); do echo "fasterq-dump $i --split-3 --skip-te
 parallel -j 10 -k --bar {} :::: parallel_input.txt 
 ```
 
-Run_accessions.txt for *S. typhi* can be found here.
+Run_accessions.txt for *S. entereica* can be found here.
 
 Run_accessions.txt for *N. gonorrhoeae* can be found here.
 
@@ -82,9 +83,9 @@ seqkit stats *_2.fastq.gz -eTb -j 10
 Run Snippy:
 
 ```         
-mkdir Typhi/Typhi_snippy
-cd Typhi/Typhi_snippy
-parallel -j 4 --bar -a /Typhi/Typhi_IDs.txt "snippy --cpus 8 --minfrac 0.9 --mincov 10 --ref /Typhi/Typhi_reference.fasta --cleanup --outdir {} --prefix {} --R1 /Typhi/Typhi_fastqs/{}_1.fastq.gz --R2 /Typhi/Typhi_fastqs/{}_2.fastq.gz"
+mkdir Sentereica/Sentereica_snippy
+cd Sentereica/Sentereica_snippy
+parallel -j 4 --bar -a /Sentereica/Sentereica_IDs.txt "snippy --cpus 8 --minfrac 0.9 --mincov 10 --ref /Sentereica/Sentereica_reference.fasta --cleanup --outdir {} --prefix {} --R1 /Sentereica/Sentereica_fastqs/{}_1.fastq.gz --R2 /Sentereica/Sentereica_fastqs/{}_2.fastq.gz"
 ```
 
 ```         
@@ -93,17 +94,17 @@ cd Ngono/Ngono_snippy
 parallel -j 4 --bar -a /Ngono/Ngono_IDs.txt "snippy --cpus 8 --minfrac 0.9 --mincov 10 --ref /NgonoNgono_reference.fasta --cleanup --outdir {} --prefix {} --R1 /Ngono/Ngono_fastqs/{}_1.fastq.gz --R2 /Ngono/Ngono_fastqs/{}_2.fastq.gz"
 ```
 
-The *S. typhi* reference is str. CT18 (accession: NC_003198.1) and the
-*N. gonorrhoaea* reference is NCCP11945 (accession: CP001050.1). For
+The *S. entereica* reference is str. CT18 (accession: NC_003198.1) and
+the *N. gonorrhoaea* reference is NCCP11945 (accession: CP001050.1). For
 both species, the \*\_ID.txt file is a text file where each line is the
 base name of the read path, in this case just the accession ID.
 
 Run Snippy-core:
 
 ```         
-mkdir Typhi/Typhi_alignments
-cd Typhi/Typhi_alignments
-snippy-core Typhi/Typhi_snippy/* --ref Typhi/Typhi_reference.fasta
+mkdir Sentereica/Sentereica_alignments
+cd Sentereica/Sentereica_alignments
+snippy-core Sentereica/Sentereica_snippy/* --ref Sentereica/Sentereica_reference.fasta
 ```
 
 ```         
@@ -118,24 +119,25 @@ Calculate stats for alignment quality:
 seqtk comp core.full.aln > core.full.stats.tsv
 ```
 
-This was done for both *S. typhi* and *N. gonorrhoeae*.
+This was done for both *S. entereica* and *N. gonorrhoeae*.
 
-Remove any failed isolates from full alignment:
+Remove any failed genomes (more than 10% Ns) from full alignment:
 
 ```         
 seqkit grep -f pass.txt  core.full.aln > passcov.core.full.aln
 ```
 
-The list of pass genomes for *S. typhi* can be found here. The list of
-pass genomes for *N. gonorrhoeae* can be found here.
+The list of pass genomes for *S. entereica* can be found here.
+
+The list of pass genomes for *N. gonorrhoeae* can be found here.
 
 ## 3. Subset alignments:
 
 Make new sub-directories for the subsetting:
 
 ```         
-mkdir Typhi/Typhi_alignments/test_alignments
-cd Typhi/Typhi_alignments/test_alignments
+mkdir Sentereica/Sentereica_alignments/test_alignments
+cd Sentereica/Sentereica_alignments/test_alignments
 
 mkdir Ngono/Ngono_alignments/test_alignments
 cd Ngono/Ngono_alignments/test_alignments
@@ -144,7 +146,7 @@ cd Ngono/Ngono_alignments/test_alignments
 Run the script that subsets the alignments:
 
 ```         
-parallel -j 10 -k --bar "bash Typhi/Typhi_alignments/subset.sh {}" ::: A B C D E F G H I J 
+parallel -j 10 -k --bar "bash Sentereica/Sentereica_alignments/subset.sh {}" ::: A B C D E F G H I J 
 
 parallel -j 10 -k --bar "bash Ngono/Ngono_alignments/subset.sh {}" ::: A B C D E F G H I J 
 ```
@@ -169,7 +171,7 @@ mkdir "$dataset_letter" && cd "$dataset_letter"
 mkdir full && cd full
 
 # Initial input file
-input_file="Typhi/Typhi_alignments/passcov.core.full.aln"
+input_file="Sentereica/Sentereica_alignments/passcov.core.full.aln"
 
 # List of values to iterate over
 values="10000 9750 9500 9250 9000 8750 8500 8250 8000 7750 7500 7250 7000 6750 6500 6250 6000 5750 5500 5250 5000 4750 4500 4250 4000 3750 3500 3250 3000 2750 2500 2250 2000 1750 1500 1250 1000 750 500 250 100 75 50 25"
@@ -191,7 +193,7 @@ The same script is run for *N. gonorrhoeae* using the relevant input.
 ## 4. Run Core-SNP-filter
 
 ```         
-parallel -j 10 -k --bar "bash Typhi/Typhi_alignments/calculate_SNPs.sh {}" ::: A B C D E F G H I J
+parallel -j 10 -k --bar "bash Sentereica/Sentereica_alignments/calculate_SNPs.sh {}" ::: A B C D E F G H I J
 
 parallel -j 10 -k --bar "bash Ngono/Ngono_alignments/calculate_SNPs.sh {}" ::: A B C D E F G H I J
 ```
@@ -217,11 +219,11 @@ fi
 dataset="$1"
 
 # new temp dir
-TMPDIR=/Typhi/Typhi_alignments/tempdir/$dataset
+TMPDIR=/Sentereica/Sentereica_alignments/tempdir/$dataset
 export TMPDIR
 
 # Path to the directory
-directory="/Typhi/Typhi_alignments/$dataset"
+directory="/Sentereica/Sentereica_alignments/$dataset"
 
 #cd
 cd "$directory"
@@ -266,6 +268,6 @@ paths.
 
 The resulting text files are then concatenated and reformatted for ease.
 
-The results for *S. typhi* can be found here.
+The results for *S. entereica* can be found here.
 
 The results for *N. gonorrhoeae* can be found here.
