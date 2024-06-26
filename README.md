@@ -15,5 +15,7 @@ This repository's contents are organised into the following directories:
     of the performance tests comparing Core-SNP-Filter to other tools.
 -   [**temporal**](temporal): contains the methods, scripts and results
     of the temporal-signal tests.
--   **largescale analysis**: contains the methods, scripts and results
-    of the large scale genome alignment tests.
+-   [**large-scale
+    analysis**](https://github.com/mtaouk/Core-SNP-filter-methods/tree/main/largescale_analysis):
+    contains the methods, scripts and results of the large scale genome
+    alignment tests.
