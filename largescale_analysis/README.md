@@ -62,9 +62,11 @@ for i in $(cat Run_accessions.txt); do echo "fasterq-dump $i --split-3 --skip-te
 parallel -j 10 -k --bar {} :::: parallel_input.txt 
 ```
 
-Run_accessions.txt for *S. entereica* can be found here.
+Run_accessions.txt for *S. entereica* can be found
+[here](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/S_enterica/Senterica_accessions.txt).
 
-Run_accessions.txt for *N. gonorrhoeae* can be found here.
+Run_accessions.txt for *N. gonorrhoeae* can be found
+[here](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/N_gonorrhoeae/Ngono_accessions.txt).
 
 Compress reads to save space as fasterq-dump does not have that option:
 
@@ -127,9 +129,11 @@ Remove any failed genomes (more than 10% Ns) from full alignment:
 seqkit grep -f pass.txt  core.full.aln > passcov.core.full.aln
 ```
 
-The list of pass genomes for *S. entereica* can be found here.
+The list of pass genomes for *S. entereica* can be found
+[here](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/S_enterica/Senterica_pass.txt).
 
-The list of pass genomes for *N. gonorrhoeae* can be found here.
+The list of pass genomes for *N. gonorrhoeae* can be found
+[here](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/N_gonorrhoeae/Ngono_pass.txt).
 
 ## 3. Subset alignments:
 
