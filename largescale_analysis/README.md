@@ -146,7 +146,7 @@ Run the script that subsets the alignments:
 ```         
 parallel -j 10 -k --bar "bash Typhi/Typhi_alignments/subset.sh {}" ::: A B C D E F G H I J 
 
-parallel -j 10 -k --bar "bash Typhi/Ngono_alignments/subset.sh {}" ::: A B C D E F G H I J 
+parallel -j 10 -k --bar "bash Ngono/Ngono_alignments/subset.sh {}" ::: A B C D E F G H I J 
 ```
 
 This script will take the pass.core.full.aln file for each species and
@@ -189,6 +189,12 @@ done
 The same script is run for *N. gonorrhoeae* using the relevant input.
 
 ## 4. Run Core-SNP-filter
+
+```         
+parallel -j 10 -k --bar "bash Typhi/Typhi_alignments/calculate_SNPs.sh {}" ::: A B C D E F G H I J
+
+parallel -j 10 -k --bar "bash Ngono/Ngono_alignments/calculate_SNPs.sh {}" ::: A B C D E F G H I J
+```
 
 Core-SNP-filter is run on each of the 44 alignments in the 10
 replicates. It is run at core frequencies of 0.5, 0.6, 0.7, 0.8, 0.9,
