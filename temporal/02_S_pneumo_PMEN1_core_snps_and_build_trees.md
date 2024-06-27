@@ -24,7 +24,7 @@ rm no_invariant.fasta.gz
 
 # Run IQ-TREE
 
-I used TVM+F+ASC+R2 because that seemed to be the most popular model. Since the process isn't deterministic, I did three trees for each (a, b and c).
+I used TVM+F+ASC+R2 because that seemed to be the most popular model according to IQ-TREE's ModelFinder. Since the process isn't deterministic, I did three trees for each (a, b and c).
 
 ```bash
 N=12
