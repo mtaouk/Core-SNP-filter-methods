@@ -3,7 +3,7 @@
 The data originally came from this paper: https://www.science.org/doi/full/10.1126/science.1198545
 And then it was reused for recombination-filtering in this paper: https://academic.oup.com/nar/article/46/22/e134/5089898
 
-The [supp data](https://www.science.org/doi/suppl/10.1126/science.1198545/suppl_file/1198545s2-rev.xls) has 241 samples, but 19 don't have years. I also decided to exclude the outgroup isolate (BM4200, ERS005337), because distance-based tree algorithms often struggle with distant outgroups, and these isolates have dates, so we can root using those instead (best root-to-tip correlation). This left me with 221 genomes.
+The [supp data](https://www.science.org/doi/suppl/10.1126/science.1198545/suppl_file/1198545s2-rev.xls) has 241 samples, but 19 don't have years. I also decided to exclude the outgroup isolate (BM4200, ERS005337), because distance-based tree algorithms often struggle with distant outgroups, and these isolates have dates, so we can root using those instead (best root-to-tip correlation). This left me with 221 genomes. Of these, 66 failed my assembly-based QC check (see below) and 1 failed my het-call QC check, leaving me with 154 genomes to use in the analysis.
 
 
 
