@@ -272,6 +272,18 @@ paths.
 
 The resulting text files are then concatenated and reformatted for ease.
 
-The results for *S. entereica* can be found here.
+The results for *S. entereica*:
 
-The results for *N. gonorrhoeae* can be found here.
+-   [All
+    ](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/N_gonorrhoeae/NG_invariant.txt)[sites](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/S_enterica/SE_invariant.txt)
+
+-   [SNP sites (no invariant
+    sites)](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/S_enterica/SE_no_invariant.txt)
+
+The results for *N. gonorrhoeae*:
+
+-   [All
+    sites](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/N_gonorrhoeae/NG_invariant.txt)
+
+-   [SNP sites (no invariant
+    sites)](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/N_gonorrhoeae/NG_no_invariant.txt)
