@@ -303,7 +303,7 @@ between the two thresholds.
 
 The following studies were used. Accessions for each study can be found
 in
-[largescale/analysis/N_gonorrhoeae/study_accessions](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/N_gonorrhoeae/study_accessions)
+[largescale/analysis/N_gonorrhoeae/study_accessions](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/N_gonorrhoeae/study_accessions).
 Note that genomes which failed QC (see above) were not included:
 
 1\. Ezewudo 2015
