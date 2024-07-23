@@ -301,11 +301,12 @@ Snippy-core, and Core-SNP-filter was used to make 100% strict-core and
 variant sites in each core alignment was then counted and compared
 between the two thresholds.
 
-The following studies were used. Their accessions are listed in a text
-file which is linked below. Note that genomes which failed QC (see
-above) were not included:\
-\
-1. Ezewudo 2015
+The following studies were used. Accessions for each study can be found
+in
+[largescale/analysis/N_gonorrhoeae/study_accessions](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/N_gonorrhoeae/study_accessions)
+Note that genomes which failed QC (see above) were not included:
+
+1\. Ezewudo 2015
 
 2\. Wind 2017
 
