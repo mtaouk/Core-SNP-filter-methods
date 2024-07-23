@@ -274,8 +274,7 @@ The resulting text files are then concatenated and reformatted for ease.
 
 The results for *S. entereica*:
 
--   [All
-    ](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/N_gonorrhoeae/NG_invariant.txt)[sites](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/S_enterica/SE_invariant.txt)
+-   [All](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/N_gonorrhoeae/NG_invariant.txt)[sites](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/S_enterica/SE_invariant.txt)
 
 -   [SNP sites (no invariant
     sites)](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/S_enterica/SE_no_invariant.txt)
@@ -287,3 +286,67 @@ The results for *N. gonorrhoeae*:
 
 -   [SNP sites (no invariant
     sites)](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/N_gonorrhoeae/NG_no_invariant.txt)
+
+## Study Alignments
+
+To investigate the effect of changing the core-SNP threshold on genomic
+epidemiology studies focusing on transmission or population structure of
+*N. gonorrhoeae*, core-SNP alignments were generated for 22 individual
+studies at both 100% and 95% thresholds.
+
+For each study, variants were called with Snippy using the *N.
+gonorrhoeae* NCCP11945 reference genome, a pseudoalignment was made with
+Snippy-core, and Core-SNP-filter was used to make 100% strict-core and
+95% soft-core alignments using the same methods as above. The number of
+variant sites in each core alignment was then counted and compared
+between the two thresholds.
+
+The following studies were used. Their accessions are listed in a text
+file which is linked below. Note that genomes which failed QC (see
+above) were not included:\
+\
+1. Ezewudo 2015
+
+2\. Wind 2017
+
+3\. Ryan 2018
+
+4\. Kwong 2016
+
+5\. Kwong 2018
+
+6\. Buckley 2018
+
+7\. Fifer 2018
+
+8\. Cehovin 2018
+
+9\. Didelot 2016
+
+10\. Golparian 2020
+
+11\. Lan 2020
+
+12\. Yahara 2018
+
+13\. Demczuk 2015
+
+14\. Lee 2018
+
+15\. Sanchez-Buso 2019
+
+16\. Thomas 2019
+
+17\. Alfsnes 2020
+
+18\. Mortimer 2020
+
+19\. Grad 2016
+
+20\. Town 2020
+
+21\. DeSilva 2016
+
+22\. Willimason 2019
+
+Results are listed in Supplementary Table 1.
