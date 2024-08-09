@@ -26,20 +26,6 @@ pdf.options(useDingbats = FALSE)
 results <- read_delim("results.tsv", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 ```
 
-Ensure that the md5sum is the same for all unique combinations of test and genome_count.
-```{r check_results}
-check_integrity <- function(md5sums) {
-  stopifnot(length(unique(md5sums)) == 1)
-}
-
-# results %>%
-#   group_by(test, genome_count) %>%
-#   do({
-#     check_integrity(.$output_md5sum)
-#     . # Return the data unmodified if the assertion passes
-#   })
-```
-
 The 16-thread goalign didn't run any faster than the 1-thread, so drop 16-thread results:
 ```{r}
 results <- results %>% filter(tool != "goalign 16 threads")
@@ -140,7 +126,7 @@ p4 <- ggplot(core_results, aes(x=genome_count, y=ram_mb, color=tool, shape=tool,
 legend1 <- get_legend(p1 + theme(legend.position = "right", legend.title=element_blank()))
 legend2 <- get_legend(p3 + theme(legend.position = "right", legend.title=element_blank()))
 
-plot_grid(p1, p2, legend1, p3, p4, legend2, nrow = 2, align = 'hv', rel_widths=c(0.5, 0.5, 0.2))
+plot_grid(p1, p2, legend1, p3, p4, legend2, nrow = 2, align = 'hv', axis = 'l', rel_widths=c(0.5, 0.5, 0.2))
 
 
 p1_dark <- p1 + dark()
@@ -150,5 +136,5 @@ p4_dark <- p4 + dark()
 legend1_dark <- get_legend(p1 + dark() + theme(legend.position = "right", legend.title=element_blank()))
 legend2_dark <- get_legend(p3 + dark() +  theme(legend.position = "right", legend.title=element_blank()))
 
-plot_grid(p1_dark, p2_dark, legend1_dark, p3_dark, p4_dark, legend2_dark, nrow = 2, align = 'hv', rel_widths=c(0.5, 0.5, 0.2))
+plot_grid(p1_dark, p2_dark, legend1_dark, p3_dark, p4_dark, legend2_dark, nrow = 2, align = 'hv', axis = 'l', rel_widths=c(0.5, 0.5, 0.2))
 ```
