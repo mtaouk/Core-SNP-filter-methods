@@ -1,13 +1,50 @@
-<p align="center"><img src="Figure1.png" alt="Figure 1" width="80%"></p>
+<p align="center">
 
-**Figure 1: lorem ipsum.** Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+<img src="Figure1.png" alt="Figure 1" width="80%"/>
+
+</p>
+
+**Figure 1: Evaluation of Core-SNP-filter Thresholds on Alignment Size
+and Variant Sites.** The number of alignment sites (in kilobases)
+plotted against the number of genomes included in each alignment
+(ranging from 25 to 10000). Each alignment was processed at core
+thresholds ranging from 50% to 100% (indicated by line colour).
+(**a**)All sites in *N. gonorrhoeae* alignments*,* (**b**)all sites in
+*S. enterica* alignments, (**c**)variant sites only in *N. gonorrhoeae*
+alignments,and(**d**)variant sites only in *S. enterica* alignments.
 
 <br><br><br><br>
-<p align="center"><img src="Figure2.png" alt="Figure 2" width="100%"></p>
 
-**Figure 2: lorem ipsum.** Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+<p align="center">
+
+<img src="Figure2.png" alt="Figure 2" width="100%"/>
+
+</p>
+
+**Figure 2: Impact of Core-SNP Thresholds on Phylogenetic and Temporal
+Signal Across Bacterial Datasets.** (**a**) The number of variant sites
+(in kilobases) at each core genome threshold from 50% to 100% for four
+bacterial datasets: *N. gonorrhoeae*, *S. aureus*, *S. enterica*, and
+*S. pneumoniae*. The variant sites are shown for both
+recombination-filtered (using Gubbins) and unfiltered alignments.
+(**b**) The *R²* value from root-to-tip regression at each core
+threshold from 50% to 100% for phylogenetic trees constructed from the
+same four bacterial datasets, indicating the strength of the temporal
+signal. For all plots the dotted line represents the 95% core threshold.
 
 <br><br><br><br>
-<p align="center"><img src="Figure3.png" alt="Figure 3" width="100%"></p>
 
-**Figure 3: Benchmarking of Core-SNP-Filter Against Other Tools with Similar Functionality.** The time taken (**a**) and RAM usage (**b**) to remove invariant sites from alignments with various numbers of genomes using three different tools (`goalign`, `coresnpfilter` and `snp-sites`). The time taken (**c**) and RAM usage (**d**) to generate a 95% core alignment across alignments with various numbers of genomes using three different tools (`trimal`, `coresnpfilter` and `goalign`). All axes are transformed with a log scale.
+<p align="center">
+
+<img src="Figure3.png" alt="Figure 3" width="100%"/>
+
+</p>
+
+**Figure 3: Benchmarking of Core-SNP-Filter Against Other Tools with
+Similar Functionality.** The time taken (**a**) and RAM usage (**b**) to
+remove invariant sites from alignments with various numbers of genomes
+using three different tools (`goalign`, `coresnpfilter` and
+`snp-sites`). The time taken (**c**) and RAM usage (**d**) to generate a
+95% core alignment across alignments with various numbers of genomes
+using three different tools (`trimal`, `coresnpfilter` and `goalign`).
+All axes are transformed with a log scale.

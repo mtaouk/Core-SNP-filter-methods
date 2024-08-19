@@ -1,10 +1,11 @@
-# PAPER TITLE
+# Exploring SNP Filtering Strategies: The Influence of Strict vs Soft Core
 
 This repository holds methods, code and data for our manuscript:<br>
 **Taouk ML, Featherstone L, Taiaroa G, Ingle DJ, Stinear TP, Wick RR.
-PAPER TITLE. JOURNAL. 2024. DOI.**
+Exploring SNP Filtering Strategies: The Influence of Strict vs Soft
+Core. 2024**
 
-You can find the Core-SNP-Filter tool here:
+**You ca**n find the Core-SNP-Filter tool here:
 [github.com/rrwick/Core-SNP-filter](https://github.com/rrwick/Core-SNP-filter)
 
 This repository's contents are organised into the following directories:
