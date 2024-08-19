@@ -8,10 +8,10 @@
 and Variant Sites.** The number of alignment sites (in kilobases)
 plotted against the number of genomes included in each alignment
 (ranging from 25 to 10000). Each alignment was processed at core
-thresholds ranging from 50% to 100% (indicated by line colour).
-(**a**)All sites in *N. gonorrhoeae* alignments*,* (**b**)all sites in
-*S. enterica* alignments, (**c**)variant sites only in *N. gonorrhoeae*
-alignments,and(**d**)variant sites only in *S. enterica* alignments.
+thresholds ranging from 50% to 100% (indicated by line colour). (**a**)
+All sites in *N. gonorrhoeae* alignments, (**b**) all sites in *S.
+enterica* alignments, (**c**) variant sites only in *N. gonorrhoeae*
+alignments, and (**d**) variant sites only in *S. enterica* alignments.
 
 <br><br><br><br>
 
