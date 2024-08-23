@@ -9,9 +9,9 @@ and Variant Sites.** The number of alignment sites (in kilobases)
 plotted against the number of genomes included in each alignment
 (ranging from 25 to 10000). Each alignment was processed at core
 thresholds ranging from 50% to 100% (indicated by line colour). (**a**)
-All sites in *N. gonorrhoeae* alignments, (**b**) all sites in *S.
-enterica* alignments, (**c**) variant sites only in *N. gonorrhoeae*
-alignments, and (**d**) variant sites only in *S. enterica* alignments.
+All sites in *N. gonorrhoeae* alignments, (**b**) all sites in *S.*
+Typhi alignments, (**c**) variant sites only in *N. gonorrhoeae*
+alignments, and (**d**) variant sites only in *S.* Typhi alignments.
 
 <br><br><br><br>
 
@@ -24,7 +24,7 @@ alignments, and (**d**) variant sites only in *S. enterica* alignments.
 **Figure 2: Impact of Core-SNP Thresholds on Phylogenetic and Temporal
 Signal Across Bacterial Datasets.** (**a**) The number of variant sites
 (in kilobases) at each core genome threshold from 50% to 100% for four
-bacterial datasets: *N. gonorrhoeae*, *S. aureus*, *S. enterica*, and
+bacterial datasets: *N. gonorrhoeae*, *S. aureus*, *S.* Kentucky, and
 *S. pneumoniae*. The variant sites are shown for both
 recombination-filtered (using Gubbins) and unfiltered alignments.
 (**b**) The *R²* value from root-to-tip regression at each core
