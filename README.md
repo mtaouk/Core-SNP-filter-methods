@@ -1,9 +1,7 @@
 # Exploring SNP Filtering Strategies: The Influence of Strict vs Soft Core
 
 This repository holds methods, code and data for our manuscript:<br>
-**Taouk ML, Featherstone L, Taiaroa G, Ingle DJ, Stinear TP, Wick RR.
-Exploring SNP Filtering Strategies: The Influence of Strict vs Soft
-Core. Under Review, 2024**
+[**Taouk ML, Featherstone L, Taiaroa G, Ingle DJ, Stinear TP, Wick RR. Exploring SNP Filtering Strategies: The Influence of Strict vs Soft Core. bioRxiv. 2024. doi:10.1101/2024.08.26.609800.**](https://doi.org/10.1101/2024.08.26.609800)
 
 You can find the Core-SNP-Filter tool here:
 [github.com/rrwick/Core-SNP-filter](https://github.com/rrwick/Core-SNP-filter)
