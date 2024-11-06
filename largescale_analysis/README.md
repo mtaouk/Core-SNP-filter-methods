@@ -62,7 +62,7 @@ for i in $(cat Run_accessions.txt); do echo "fasterq-dump $i --split-3 --skip-te
 parallel -j 10 -k --bar {} :::: parallel_input.txt 
 ```
 
-Run_accessions.txt for *S. entereica* can be found
+Run_accessions.txt for *S.* Typhi can be found
 [here](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/S_enterica/Senterica_accessions.txt).
 
 Run_accessions.txt for *N. gonorrhoeae* can be found
@@ -96,8 +96,8 @@ cd Ngono/Ngono_snippy
 parallel -j 4 --bar -a /Ngono/Ngono_IDs.txt "snippy --cpus 8 --minfrac 0.9 --mincov 10 --ref /NgonoNgono_reference.fasta --cleanup --outdir {} --prefix {} --R1 /Ngono/Ngono_fastqs/{}_1.fastq.gz --R2 /Ngono/Ngono_fastqs/{}_2.fastq.gz"
 ```
 
-The *S. entereica* reference is str. CT18 (accession: NC_003198.1) and
-the *N. gonorrhoaea* reference is NCCP11945 (accession: CP001050.1). For
+The *S.* Typhi reference is str. CT18 (accession: NC_003198.1) and the
+*N. gonorrhoaea* reference is NCCP11945 (accession: CP001050.1). For
 both species, the \*\_ID.txt file is a text file where each line is the
 base name of the read path, in this case just the accession ID.
 
@@ -121,7 +121,7 @@ Calculate stats for alignment quality:
 seqtk comp core.full.aln > core.full.stats.tsv
 ```
 
-This was done for both *S. entereica* and *N. gonorrhoeae*.
+This was done for both *S.* Typhi and *N. gonorrhoeae*.
 
 Remove any failed genomes (more than 10% Ns) from full alignment:
 
@@ -129,7 +129,7 @@ Remove any failed genomes (more than 10% Ns) from full alignment:
 seqkit grep -f pass.txt  core.full.aln > passcov.core.full.aln
 ```
 
-The list of pass genomes for *S. entereica* can be found
+The list of pass genomes for *S.* Typhi can be found
 [here](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/S_enterica/Senterica_pass.txt).
 
 The list of pass genomes for *N. gonorrhoeae* can be found
@@ -272,9 +272,10 @@ paths.
 
 The resulting text files are then concatenated and reformatted for ease.
 
-The results for *S. entereica*:
+The results for *S.* Typhi:
 
--   [All](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/N_gonorrhoeae/NG_invariant.txt)[sites](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/S_enterica/SE_invariant.txt)
+-   [All
+    sites](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/S_enterica/SE_invariant.txt)
 
 -   [SNP sites (no invariant
     sites)](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/S_enterica/SE_no_invariant.txt)
@@ -287,67 +288,193 @@ The results for *N. gonorrhoeae*:
 -   [SNP sites (no invariant
     sites)](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/N_gonorrhoeae/NG_no_invariant.txt)
 
+For the *S.* Typhi alignments ranging from 25 genomes to 2000 genomes in
+the A iteration, gubbins was run to identify regions of recombination:
+
+```         
+parallel -j 5 -k --bar "cd {} && run_gubbins.py --threads 10 A_{}_full.fa && cd ../" ::: 2000 1750 1500 1250 1000 750 500 250 100 75 50 25
+```
+
+Core-SNP-filter was run using the Gubbins filtered polymorphic sites as
+input:
+
+```         
+#!/bin/bash
+
+# new temp dir
+TMPDIR=/home/taouk/core-genome/Typhi_alignments/gubbins/tempdir
+export TMPDIR
+
+# Path to the directory
+directory="/home/taouk/core-genome/Typhi_alignments/gubbins/A"
+
+#cd
+cd "$directory"
+
+# Function to perform coresnpfilter for a given coverage
+perform_coresnpfilter() {
+    threshold="$1"
+    output_file_NOinvariant=gubbins_"$threshold"_NOinvariant.txt
+    raw_file_NOinvariant=gubbins_"$threshold"_NOinvariant_raw.txt
+
+    for i in 2000 1750 1500 1250 1000 750 500 250 100 75 50 25; do
+        coresnpfilter -e -c "$threshold" ${i}/A_"${i}"_full.filtered_polymorphic_sites.fasta 1> /dev/null 2>> "$raw_file_NOinvariant"
+    done
+
+    grep -e "input file" -e "output sequence length" "$raw_file_NOinvariant" | sed '/^  input file:/N; s/\n/\t/' > "$output_file_NOinvariant"
+}
+
+#Perform coresnpfilter for different thresholds
+perform_coresnpfilter 1.0
+perform_coresnpfilter 0.99
+perform_coresnpfilter 0.98
+perform_coresnpfilter 0.97
+perform_coresnpfilter 0.96
+perform_coresnpfilter 0.95
+perform_coresnpfilter 0.90
+perform_coresnpfilter 0.80
+perform_coresnpfilter 0.70
+perform_coresnpfilter 0.60
+perform_coresnpfilter 0.50
+```
+
 ## Study Alignments
 
 To investigate the effect of changing the core-SNP threshold on genomic
-epidemiology studies focusing on transmission or population structure of
-*N. gonorrhoeae*, core-SNP alignments were generated for 22 individual
-studies at both 100% and 95% thresholds.
+epidemiology studies focusing on transmission or population structure,
+core-SNP alignments were generated for 22 individual studies of *N.
+gonorrhoeae* and 18 studies of *S.* Typhi at both 100% and 95%
+thresholds.
 
-For each study, variants were called with Snippy using the *N.
-gonorrhoeae* NCCP11945 reference genome, a pseudoalignment was made with
+For each study, variants were called with Snippy using the same
+reference genomes as detailed above, a pseudoalignment was made with
 Snippy-core, and Core-SNP-filter was used to make 100% strict-core and
 95% soft-core alignments using the same methods as above. The number of
 variant sites in each core alignment was then counted and compared
 between the two thresholds.
 
-The following studies were used. Accessions for each study can be found
-in
+Further, the pairwise SNP distance between all genomes within a given
+study was calculated and the number of identical genomes for each study
+was printed according to the following script. The script is below but
+paths may need to be changed to be run locally:
+
+```         
+#!/bin/bash
+
+# Directory containing your alignments
+ALIGNMENT_DIR="/home/taouk/core-genome/Typhi_alignments/study_alignments/results"
+
+# Output file to store the results
+OUTPUT_FILE="snp_pairs_count.txt"
+
+# Iterate over each alignment file
+for ALIGNMENT_FILE in "${ALIGNMENT_DIR}"/*.fasta; do
+    # Extract the name of the alignment file without extension
+    ALIGNMENT_NAME=$(basename "${ALIGNMENT_FILE}" .fasta)
+    
+    # Calculate SNP distances between isolates using snp-dists
+    snp-dists -m "${ALIGNMENT_FILE}" > "${ALIGNMENT_NAME}_snp_dists_molten.txt"
+    
+    # Count the number of isolate pairs that are ≤10 SNPs apart, excluding self-comparisons
+    SNP_PAIRS_ZERO_COUNT=$(awk '$3 == 0 && $1 != $2 {count++} END {print count/2}' "${SNP_DIST_FILE}")
+    
+    # Print the results
+    echo "Alignment: ${ALIGNMENT_NAME} - Number of isolate pairs <10 SNPs apart (excluding self-comparisons, accounting for symmetry): ${SNP_PAIRS_COUNT}" >> "${OUTPUT_FILE}"
+done
+
+echo "SNP pair counts for all alignments have been calculated and saved to ${OUTPUT_FILE}"
+```
+
+For *N. gonorrhoea,* the following studies were used. Accessions for
+each study can be found in
 [largescale/analysis/N_gonorrhoeae/study_accessions](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/N_gonorrhoeae/study_accessions).
 Note that genomes which failed QC (see above) were not included:
 
-1\. Ezewudo 2015
+Ezewudo 2015
 
-2\. Wind 2017
+Wind 2017
 
-3\. Ryan 2018
+Ryan 2018
 
-4\. Kwong 2016
+Kwong 2016
 
-5\. Kwong 2018
+Kwong 2018
 
-6\. Buckley 2018
+Buckley 2018
 
-7\. Fifer 2018
+Fifer 2018
 
-8\. Cehovin 2018
+Cehovin 2018
 
-9\. Didelot 2016
+Didelot 2016
 
-10\. Golparian 2020
+Golparian 2020
 
-11\. Lan 2020
+Lan 2020
 
-12\. Yahara 2018
+Yahara 2018
 
-13\. Demczuk 2015
+Demczuk 2015
 
-14\. Lee 2018
+Lee 2018
 
-15\. Sanchez-Buso 2019
+Sanchez-Buso 2019
 
-16\. Thomas 2019
+Thomas 2019
 
-17\. Alfsnes 2020
+Alfsnes 2020
 
-18\. Mortimer 2020
+Mortimer 2020
 
-19\. Grad 2016
+Grad 2016
 
-20\. Town 2020
+Town 2020
 
-21\. DeSilva 2016
+DeSilva 2016
 
-22\. Willimason 2019
+Willimason 2019
 
 Results are listed in Supplementary Table 1.
+
+For *S.* Typhi*,* the following studies were used. Accessions for each
+study can be found in
+[largescale/analysis/S_enterica/study_accessions](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/S_enterica/study_accessions).
+Note that genomes which failed QC (see above) were not included:
+
+rasheed2020
+
+thilliez2022
+
+guevara2021
+
+argimon2022
+
+klemm2018
+
+ingle2019
+
+kariuki2021
+
+pragasam2020
+
+maes2022
+
+rahman2020
+
+park2018
+
+gauld2022
+
+carey2024
+
+ashton2016
+
+tanmoy2018
+
+chattaway2021
+
+wong2015
+
+desilva2022
+
+Results are listed in Supplementary Table 2.
