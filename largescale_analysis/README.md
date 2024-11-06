@@ -338,6 +338,9 @@ perform_coresnpfilter 0.60
 perform_coresnpfilter 0.50
 ```
 
+The results can be found
+[here](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/S_enterica/SE_gubbins_alignments.txt).
+
 ## Study Alignments
 
 To investigate the effect of changing the core-SNP threshold on genomic
