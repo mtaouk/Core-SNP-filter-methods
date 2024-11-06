@@ -436,7 +436,7 @@ Willimason 2019
 
 Results are listed in Supplementary Table 1.
 
-For *S.* Typhi*,* the following studies were used. Accessions for each
+For *S.* Typhi, the following studies were used. Accessions for each
 study can be found in
 [largescale/analysis/S_enterica/study_accessions](https://github.com/mtaouk/Core-SNP-filter-methods/blob/main/largescale_analysis/S_enterica/study_accessions).
 Note that genomes which failed QC (see above) were not included:
