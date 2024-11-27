@@ -10,15 +10,16 @@ tar_files <- list.files(tree_dir, pattern = "\\.tar\\.gz$", full.names = TRUE)
 
 # Function calculates RF dist and records treatment. Used in loop below
 calc_rf_distances <- function(trees) {
-    distance <- c(0)
+    distance <- vector()
     treatment <- gsub(".+_", "", names(trees))
     n_tips <- length(trees[[1]]$tip.label)
     threshold <- as.numeric(gsub("_.+", "", names(trees))) / n_tips
+    n_trees <- length(trees)
 
-    for (i in 1:(length(trees) - 1)) {
+    for (i in 1:n_trees) {
         distance <- c(
-            RF.dist(trees[[i]], trees[[i + 1]], normalize = TRUE),
-            distance
+            distance,
+            RF.dist(trees[[i]], trees[[n_trees]], normalize = TRUE)
         )
     }
 
@@ -44,9 +45,9 @@ for (tar_file in tar_files) {
     trees_b <- lapply(tree_files_b, function(f) read.tree(f))
     trees_c <- lapply(tree_files_c, function(f) read.tree(f))
 
-    names(trees_c) <- gsub(".newick$", "", basename(tree_files_c))
-    names(trees_b) <- gsub(".newick$", "", basename(tree_files_b))
     names(trees_a) <- gsub(".newick$", "", basename(tree_files_a))
+    names(trees_b) <- gsub(".newick$", "", basename(tree_files_b))
+    names(trees_c) <- gsub(".newick$", "", basename(tree_files_c))
 
     df_a <- calc_rf_distances(trees_a)
     df_b <- calc_rf_distances(trees_b)
@@ -69,7 +70,7 @@ ggplot(data, aes(x = threshold, y = distance, col = treatment)) +
     geom_line(alpha = 0.8) +
     ylim(0, 1) +
     labs(
-        y = "RF Distance between consecutive trees)",
+        y = "RF Distance from 100% threshold tree",
         x = "Threshold",
         color = "Replicate"
      ) +
